@@ -3,4 +3,6 @@ An interactive reveal.js presentation using org-mode.  The necessary
 emacs configuration code can be found in the ~config.org~ file. I host
 an exported version on my website
 [[https://www.hirthjo.org/fca-org-reveal/presentation.html]].
+** Copyright
+The copyright licence can be taken from the respective files.
 
