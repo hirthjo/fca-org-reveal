@@ -1,0 +1,277 @@
+:COPYRIGHT:
+# Copyright ⓒ Johannes Hirth; all rights reserved.  The use and
+# distribution terms for this software are covered by the Eclipse
+# Public License 1.0
+# (http://opensource.org/licenses/eclipse-1.0.php).  By using this
+# software in any fashion, you are agreeing to be bound by the terms
+# of this license. You must not remove this notice, or any other,
+# from this software.
+:END:
+
+* Org-Reveal Configuration
+** Export Variables
+#+BEGIN_SRC emacs-lisp
+(setq pseudo-code-header-sep "<tr class=\"highlight-line hljs-header-sep\"></tr>")
+(setq pseudo-code-indend "   ")
+(setq pseudo-code-comment "//")
+(setq pseudo-code-keywords '("for" " in " "if" "else" "elif" "return")) ; be careful not to add a substring of the keyword span
+#+END_SRC
+** Keyword Export
+*** Include HTML File
+Inserts the content of another html file at used position.
+#+BEGIN_SRC emacs-lisp
+(defun make-html-src-export (str)
+  (with-temp-buffer
+    (insert-file-contents str)
+    (buffer-string)))
+#+END_SRC
+*** iframe
+Inserts the content of another html file at used position in an
+iframe. Useful for plotly diagrams.
+#+BEGIN_SRC emacs-lisp
+(defun make-html-src-iframe-export (str)
+  (concat "<div class=\"p_iframe\"> 
+                 <iframe frameborder=\"0\" seamless='seamless' scrolling=no src=\""
+               str
+               "\" style=\"width:90%;  height:576px;\">
+               </iframe>
+               </div>"))
+#+END_SRC
+*** Order Diagram
+Inserts an interactive order diagram an a given point. The argument is
+the path to a file containing the layout json format of conexp-clj.
+#+BEGIN_SRC emacs-lisp
+(defun make-order-diagram-export (str)
+  "First parameter is the file for the layout in conexp-clj json
+format. Then a list of key value pairs. You can set :width :height :scale"
+  (let ((file (first (split-string str " ")))
+        (options (cdr (split-string str " "))))
+
+    (let ((id 
+           (first (last (butlast 
+                         (split-string 
+                          (first(last (split-string file "/")))
+                          "\\.")))))
+          (width-idx (cl-position ":width" options :test 'equal))
+          (height-idx (cl-position ":height" options :test 'equal))
+          (scale-idx (cl-position ":scale" options :test 'equal))
+          (coordsModifier-idx (cl-position ":coordsModifier" options :test 'equal)))
+      (let ((width (if width-idx (nth (+ 1 width-idx) options) "300"))
+            (height (if height-idx (nth (+ 1 height-idx) options) "300"))
+            (scale (if scale-idx (nth (+ 1 scale-idx) options) "5"))
+            (coordsModifier (if scale-idx (nth (+ 1 coordsModifier-idx) options) "5")))
+        (format 
+         "<div style=\"width: %spx; height: %spx; display: block;\" ><div id=\"%s\" class=\"concept-lattice-json\" style=\"width: 100%%; height: 100%%;\" scale=\"%s\"; coordsModifier=\"%s\">%s</div></div>" 
+          width height id scale coordsModifier (string-replace "\n" "" (with-temp-buffer
+                                                                        (insert-file-contents file)
+                                                                        (buffer-string)) )) 
+        
+        ))))
+
+#+END_SRC
+*** Exporter
+Exporter of org-reveal for keywords with my additional exports.
+#+BEGIN_SRC emacs-lisp
+(defun org-reveal-keyword (keyword contents info)
+  "Transcode a KEYWORD element from Org to Reveal,
+and may change custom variables as SIDE EFFECT.
+CONTENTS is nil. INFO is a plist holding contextual information."
+  (let ((key (org-element-property :key keyword))
+        (value (org-element-property :value keyword)))
+    (cl-case (intern key)
+      (REVEAL (org-reveal-parse-keyword-value keyword value info))
+      (REVEAL_HTML value)
+      (REVEAL_HTML_SRC        (make-html-src-export value))
+      (REVEAL_HTML_SRC_IFRAME (make-html-src-iframe-export value))
+      (REVEAL_BLOCK_TITLE     (make-block-title-export value))
+      (REVEAL_ORDER_DIAGRAM   (make-order-diagram-export value))
+      (HTML value))))
+#+END_SRC
+** Special Block Export
+*** Fragmented Definitions and Other
+Inserts a definition block that uses fragments at each empty line.
+**** Title
+Technically called by the keyword exporter. Could be added as argument
+to the special block as used by the pseudo-code block exporter.
+#+BEGIN_SRC emacs-lisp
+(defun make-block-title-export (str)
+  (format "<h4 class=\"block-title\">%s</h4>" str))
+#+END_SRC
+**** Block
+Build definition container.
+#+BEGIN_SRC emacs-lisp
+(defun recursive-build-fragmented 
+    (list result idx)
+  (if list 
+      (let ((next (first list))
+            (remaining (cdr list)))
+        (recursive-build-fragmented remaining
+                                    (-concat result 
+                                             (if (and (string= "<p>" next) (> idx 0))
+                                                 (list "\n" (format "<p data-fragment-index=\"0\" class=\"fragment\" data-fragment-index=\"%i\">" idx))
+                                               (list next)))
+                                    (if (string= "<p>" next)
+                                        (+ 1 idx)
+                                      idx)))
+    result))
+
+
+(defun fragmented-definition-block (contents)
+  (concat 
+   "<div class=\"DEFINITION\">"
+   (apply 'concat
+          (recursive-build-fragmented (split-string contents "\n") '() 0))
+   "</div>"))
+#+END_SRC
+*** Pseudo-Code
+Exporter for Pseudo-Code blocks
+**** Header
+If exists, build the block header containing the title, input and output.
+#+BEGIN_SRC emacs-lisp
+(defun pseudo-code-title (title) 
+  (format 
+   "<tr class=\"highlight-line\">
+   <td class=\"hljs-ln-line hljs-ln-header\"></td>
+   <td class=\"hljs-ln-line hljs-ln-header hljs-ln-code hljs-ln-title\">%s</td>
+  </tr>" title))
+
+(defun pseudo-code-input (input) 
+  (format 
+"<tr class=\"highlight-line\">
+   <td class=\"hljs-ln-line hljs-ln-header\"></td>
+   <td class=\"hljs-ln-line hljs-ln-header hljs-ln-code\"> 
+     <span class=\"hljs-keyword\">Input: </span> %s
+   </td>
+ </tr>" input))
+
+(defun pseudo-code-output (output) 
+    (format 
+"<tr class=\"highlight-line\">
+   <td class=\"hljs-ln-line hljs-ln-header\"></td>
+   <td class=\"hljs-ln-line hljs-ln-header hljs-ln-code\"> 
+     <span class=\"hljs-keyword\">Output: </span> %s
+   </td>
+ </tr>" output))
+#+END_SRC
+**** Code
+Exports the pseudo-code block. Functionality for comments and keyword
+highlighting is included.
+
+***** Comments
+#+BEGIN_SRC emacs-lisp
+(defun comment-line-code (line) 
+  (if (string-match pseudo-code-comment line)
+      (concat (string-replace "//" "<span class=\"pseudo-code-comment\">//" line)
+              "</span>")
+      line))
+
+#+END_SRC
+***** Highlighting
+#+BEGIN_SRC emacs-lisp
+(defun highlight-pseudo-code-keyword (key) 
+  (format "<span class=\"hljs-keyword\">%s</span>" key))
+
+(defun make-pseudo-code-line-keywords (line keywords)
+  (if keywords
+      (let ((key (first keywords))
+            (remaining (cdr keywords)))
+        (make-pseudo-code-line-keywords
+         (string-replace key (highlight-pseudo-code-keyword key) line)
+         remaining))
+    (string-replace pseudo-code-indend "\\(\\quad\\)" line)))
+
+#+END_SRC
+***** Block
+Lines
+#+BEGIN_SRC emacs-lisp
+(defun make-pseudo-code-line (line idx)
+  (concat  (format "<tr class=\"highlight-line\">
+              <td class=\"hljs-ln-line hljs-ln-numbers\" data-line-number=\"%i\">
+                 <div class=\"hljs-ln-n\" data-line-number=\"%i\">
+                 </div>
+              </td>
+              <td class=\"hljs-ln-line hljs-ln-code\" data-line-number=\"1\" contenteditable=\"true\">" idx idx)
+           (make-pseudo-code-line-keywords (comment-line-code line) 
+                                            pseudo-code-keywords)
+            "</td>
+           </tr>"))
+
+(defun recursive-pseudo-code (lines html-lines idx)
+  (if lines 
+      (let ((next (first lines))
+            (remaining (cdr lines)))
+        (recursive-pseudo-code remaining
+                               (-concat html-lines 
+                                       (list (make-pseudo-code-line next idx)))
+                               (+ 1 idx)))
+    (apply 'concat html-lines)))
+
+(defun pseudo-code-contents (contents) 
+  (let ((lines 
+         (butlast (cdr
+                   (split-string contents "\n")) 2)))
+    (recursive-pseudo-code lines '() 1)))
+#+END_SRC
+Container
+#+BEGIN_SRC emacs-lisp
+(defun pseudo-code-block (special-block contents info)
+  (let ((stuff (second special-block))) 
+    (let ( (title-idx (cl-position :attr_code_title  (second special-block)))
+           (input-idx (cl-position :attr_code_input  (second special-block)))
+           (output-idx (cl-position :attr_code_output (second special-block)))
+           (auto-animate-id-idx (cl-position :attr_code_data_id (second special-block))))
+      (format 
+"<div class=\"org-src-container\">
+  <pre class=\"code-wrapper\"> 
+    <div %s class=\"hljs has-highlights\" data-line-numbers=\"1-100\" >
+      <table class=\"hljs-in\">
+        <tbody class=\"hljs-tbody\"> 
+%s
+%s
+%s
+%s
+%s     
+        </tbody>
+      </table>
+   </div>
+  </pre>
+</div>"
+(if auto-animate-id-idx
+    (format "data-id=\"%s\"" (first (nth (+ 1 auto-animate-id-idx) stuff)))
+  "")
+(if title-idx
+    (pseudo-code-title (first (nth (+ 1 title-idx) stuff)))
+  "")
+(if input-idx
+    (pseudo-code-input (first (nth (+ 1 input-idx) stuff)))
+  "")
+(if output-idx
+    (pseudo-code-output (first (nth (+ 1 output-idx) stuff)))
+  "")
+(if (or input-idx output-idx title-idx)
+    pseudo-code-header-sep
+  "")
+(pseudo-code-contents contents)))))
+#+END_SRC
+*** Exporter
+#+BEGIN_SRC emacs-lisp
+(defun org-reveal-special-block (special-block contents info)
+  "Transcode a SPECIAL-BLOCK element from Org to Reveal.
+CONTENTS holds the contents of the block. INFO is a plist
+holding contextual information.
+If the block type is 'NOTES', transcode the block into a
+Reveal.js slide note. Otherwise, export the block as by the HTML
+exporter."
+  (let ((block-type (org-element-property :type special-block)))
+    (cond ((string= (upcase block-type) "NOTES")
+	   (if org-reveal-ignore-speaker-notes
+	       ""
+             (format "<aside class=\"notes\">\n%s\n</aside>\n" contents)))
+          ((string= (upcase block-type) "DEFINITION_FRAG") 
+          ; It would be better to make this export dependent on a block attribute.
+          ; That would preserve compatibility with latex exports
+           (fragmented-definition-block contents))
+          ((string= (upcase block-type) "PSEUDO_CODE")
+           (pseudo-code-block special-block contents info))
+          (t (org-html-special-block special-block contents info)))))
+#+END_SRC

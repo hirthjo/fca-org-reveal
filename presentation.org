@@ -1,0 +1,213 @@
+:PROPERTIES: 
+:reveal_overview: t
+:EXPORT_AUTHOR: Johannes Hirth
+:END:
+
+:ORG_EXPORT:
+#+OPTIONS: toc:1
+# for pdf export open with "?print-pdf" suffix
+:END:
+
+:REVEAL_PROPERTIES:
+#+REVEAL_ROOT: deps/reveal.js
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="deps/zenburn.css" />
+#+REVEAL_REVEAL_JS_VERSION: 4
+#+REVEAL_THEME: moon
+#+REVEAL_BACKGROUND: #123456
+#+REVEAL_PLUGINS: (highlight notes multiplex)
+
+#+REVEAL_MULTIPLEX_ID: <Enter Public ID>
+#+REVEAL_MULTIPLEX_SECRET: <Enter Secret ID>
+#+REVEAL_MULTIPLEX_URL: https://reveal-multiplex.glitch.me
+#+REVEAL_MULTIPLEX_SOCKETIO_URL: deps/socket.io.min.js
+
+# #+REVEAL_MATHJAX_URL: deps/MathJax/MathJax.js
+:END:
+
+:HEAD:
+# jquery
+
+#+HTML_HEAD: <script src="deps/jquery-3.5.1.js"></script>
+
+# MathJax
+
+# #+HTML_HEAD: <script src="deps/Mathjax_2.7.5.js"></script>
+
+# Datatable
+
+#+HTML_HEAD: <script src="deps/jquery.dataTables.min.js"></script>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="deps/jquery.dataTables.min.css" />
+
+#+HTML_HEAD: <script src="deps/dataTables.colReorder.min.js"></script>
+#+HTML_HEAD: <script src="deps/dataTables.rowReorder.min.js"></script>
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="deps/colReorder.dataTables.min.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="deps/rowReorder.dataTables.min.css" />
+
+# context
+#+HTML_HEAD: <script src="util/context.js"></script>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/context.css" /> 
+
+# Extra css
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/block.css" /> 
+
+# Line Diagram
+#+HTML_HEAD: <script src="deps/cytoscape.min.js"></script>
+#+HTML_HEAD: <script src="util/line_diagram.js"></script>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/line-diagram.css" /> 
+
+# code block stuff
+#+HTML_HEAD: <script src="util/code.js"></script>
+
+# slide styles
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/slides.css" /> 
+:END:
+
+#+Title: Org Reveal FCA
+#+Author: Johannes Hirth
+#+Subtitle: An interactive reveal.js presentation using org-mode
+
+* Introduction Formal Concept Analysis
+:MATH_JAX:
+#+BEGIN_HTML
+\(
+\renewcommand{\context}{\mathbb{K}}
+\renewcommand{\B}{\mathfrak{B}}
+\renewcommand{\BV}{\underline{\mathfrak{B}}}
+\)
+#+END_HTML
+:END:
+** Formal Context
+#+REVEAL_BLOCK_TITLE: DEFINITION: Formal Context
+#+BEGIN_DEFINITION_FRAG
+A formal context $\context$ is a triple $(G,M,I)$ where $G$ is the set
+of object, $M$ the set of attributes and $I\subseteq G\times M$ an
+incidence relation between them. 
+
+In case $(g,m)\in I$ we say "/object/ $g$ /has attribute/ $m$".
+#+END_DEFINITION_FRAG
+
+** Formal Context
+#+REVEAL_HTML_SRC: contexts/context.html
+
+* Concept Lattice 
+** Formal Concept
+
+#+REVEAL_BLOCK_TITLE: DEFINITION: Formal Concept
+#+BEGIN_DEFINITION_FRAG
+A formal concept of a formal context $\context=(G,M,I)$ is a pair
+$(A,B)$ with $A\subseteq G, B\subseteq M$ with $A´=B$ and $B´=A$. 
+
+We call $A$ the extent and $B$ the intent of the concept and denoted
+by $\B(\context)$ the set of all concepts of $\context$.
+#+END_DEFINITION_FRAG
+
+** Compute all Formal Concepts
+:PROPERTIES:
+:REVEAL_EXTRA_ATTR: data-auto-animate
+:END:
+
+#+INCLUDE: "./speaker_notes.org::#NextClojure" :only-contents t
+
+#+ATTR_CODE_TITLE: Next_Clojure
+#+ATTR_CODE_INPUT: \(A \subseteq M\), Order < on M, Closure Operator \((\cdot )\)”
+#+ATTR_CODE_OUTPUT: Lectically Next Closed Set of A
+#+ATTR_CODE_DATA_ID: nextcl
+#+BEGIN_PSEUDO_CODE 
+for i $\in$ M in descending order (<):
+   if i $\in$ A:
+      A = A \ $\{i\}$
+   else:
+      B = (A $\cup\ \{i\}$)”
+      if \not\exists j \in  B\A with $j < i$:
+         return B
+return $\bot$
+#+END_PSEUDO_CODE
+
+** Compute all Formal Concepts with Comments
+:PROPERTIES:
+:REVEAL_EXTRA_ATTR: data-auto-animate
+:END:
+
+#+INCLUDE: "./speaker_notes.org::#NextClojure" :only-contents t
+
+#+ATTR_CODE_TITLE: Next_Closure
+#+ATTR_CODE_INPUT: \(A \subseteq M\), Order < on M, Closure Operator \((\cdot )\)”
+#+ATTR_CODE_OUTPUT: Lectically Next Closed Set of A
+#+ATTR_CODE_DATA_ID: nextcl
+#+BEGIN_PSEUDO_CODE 
+for i $\in$ M in descending order (<):
+   // < induces the lectic in which all concepts are computed
+   if i $\in$ A:
+      A = A \ $\{i\}$
+   else:
+      B = (A $\cup\ \{i\}$)”
+      // Check if the closed set B is the lectically next
+      if \not\exists j \in  B\A with $j < i$:
+         return B
+// No more concepts
+return $\bot$
+#+END_PSEUDO_CODE
+
+** Concept Lattice
+#+REVEAL_BLOCK_TITLE: DEFINITION: Concept Lattice
+#+BEGIN_DEFINITION_FRAG
+The set of formal concepts $\B(\context)$ of a context $\context$
+ordered by set-inclusion on their respective extents constitudes a
+lattice order, denoted $\BV(\context)$.
+#+END_DEFINITION_FRAG
+
+** Concept Lattice
+#+REVEAL_BLOCK_TITLE: Theorem: The Basic Theorem on Concept Lattices (Part I)
+#+BEGIN_DEFINITION_FRAG
+The concept lattice $\BV(\context)$ is a complete lattice in which infimum and supremum are given by:
+$$\bigwedge_{t\in T} (A_t,B_t)=\left(\bigcap_{t\in T}A_t,\left(\bigcup_{t\in T}B_t\right)”\right)$$
+$$\bigvee_{t\in T} (A_t,B_t)=\left(\left(\bigcup_{t\in T}A_t\right)”,\cap_{t\in T}B_t\right)$$
+#+END_DEFINITION_FRAG
+
+** Line Diagram
+# Tikz Variation
+
+#+header: :imagemagick yes :iminoptions -density 800 :imoutoptions -geometry 1200 
+#+header: :fit yes :noweb yes :headers '("\\usepackage{tikz}" "\\usepackage{graphicx}")
+#+BEGIN_SRC latex :exports results :file line-diagram/bj.png
+\input{line-diagram/bj.tikz}
+#+END_SRC
+
+#+REVEAL_HTML: <img src="./line-diagram/bj.png">
+
+** Line Diagram
+#+REVEAL_ORDER_DIAGRAM: line-diagram/bj.json :width 1200 :height 800 :scale 30 :coordsModifier 25
+
+* Ordinal Factors 
+** Ordinal Factor Analysis
+#+REVEAL_BLOCK_TITLE: Problem: Ordinal Factor Analysis
+#+BEGIN_DEFINITION_FRAG
+For a context \(\context=(G,M,I)\) find a partition of \(I\) into a minimal number of Ferrers relations.
+#+END_DEFINITION_FRAG
+** Icecream Data Ordinal Factors
+#+REVEAL_HTML_SRC: contexts/bj_factors.html
+#+INCLUDE: "./speaker_notes.org::#IceFactors" :only-contents t
+** Scatter Plot
+#+INCLUDE: "plotly/ice_factors.org" 
+#+REVEAL_HTML_SRC_IFRAME: plotly/factor_3d.html
+
+
+* Incident or not Incident? 
+:PROPERTIES:
+  :UNNUMBERED: notoc
+:END:
+
+#+INCLUDE: "plotly/one_zero.org" 
+#+REVEAL_HTML_SRC_IFRAME: plotly/one_zero.html
+
+:COPYRIGHT:
+# Copyright ⓒ Johannes Hirth; all rights reserved.  The use and
+# distribution terms for this software are covered by the Eclipse
+# Public License 1.0
+# (http://opensource.org/licenses/eclipse-1.0.php).  By using this
+# software in any fashion, you are agreeing to be bound by the terms
+# of this license. You must not remove this notice, or any other,
+# from this software.
+:END:

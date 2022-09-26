@@ -1,0 +1,22 @@
+* Introduction Formal Concept Analysis
+** Compute all Formal Concepts
+:PROPERTIES:
+:CUSTOM_ID: NextClojure
+:END:
+
+#+BEGIN_NOTES
+Make Clojure Joke
+#+END_NOTES
+
+
+* Ordinal Factors
+** Icecream Data Ordinal Factors
+:PROPERTIES:
+:CUSTOM_ID: IceFactors
+:END:
+
+#+BEGIN_NOTES
+Nice Order
+Obj: FB HB CD SCB CCC CS PBC
+Attr: CP Va D B CI CaI Ca PI PB
+#+END_NOTES

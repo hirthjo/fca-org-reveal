@@ -1,0 +1,3 @@
+.concept-lattice-json :first-child :last-child{
+    position : relative !important;
+}

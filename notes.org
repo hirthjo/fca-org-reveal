@@ -1,0 +1,3 @@
+* TODO Concept defintion
+* TODO Line Diagram elisp support
+* TODO rerender math on keypress

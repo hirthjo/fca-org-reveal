@@ -1,0 +1,55 @@
+@import "compass/css3";
+
+.context {
+  font-family: 'Arial' !important;
+  margin: 25px auto !important;
+  border-collapse: collapse !important;
+  border-bottom: 2px solid #00cccc !important;
+  box-shadow: 0px 0px 20px rgba(0,0,0,0.10),
+              0px 10px 20px rgba(0,0,0,0.05),
+              0px 20px 20px rgba(0,0,0,0.05),
+              0px 30px 20px rgba(0,0,0,0.05) !important;
+  font-size: medium !important;
+}
+  .ctx {
+   text-align: center !important;
+   border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
+   border-right: 4px solid rgba(0, 0, 0, 0.6) !important;
+   color: #A0A0A0 !important;
+   font-weight: bold !important;
+  }
+  .attr {
+      background: #00cccc !important;
+      text-align: center !important ; 
+      font-weight: bold !important;
+      color: black !important;
+      border-right: 2px solid rgba(0, 0, 0, 0.15) !important;
+      border-bottom: 4px solid rgba(0, 0, 0, 0.6) !important;
+  }
+  .obj {
+      background: #00cccc !important;
+      color: black !important;
+      text-align: left !important;
+      font-weight: bold !important;
+      border-right: 4px solid rgba(0, 0, 0, 0.6) !important;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.15) !important;
+  }
+  .incidence {
+      text-align: center !important;
+      font-weight: bold !important;
+      border-right: 2px solid rgba(0, 0, 0, 0.15) !important;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.15) !important;
+      color: #A0A0A0 !important;
+  }
+  .marked-incidence{
+      color: #00cccc !important;
+  }
+  .obj, .ctx, .attr ,.incidence {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+

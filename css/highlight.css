@@ -1,0 +1,7 @@
+.hljs {
+  background: #35464d !important;
+}
+
+.reveal .hljs.has-highlights tr:not(.highlight-line) {
+    opacity: .2 !important;
+}

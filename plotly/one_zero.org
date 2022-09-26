@@ -1,0 +1,61 @@
+#+BEGIN_SRC python :exports results :results none
+import plotly.express as px
+import random
+import numpy as np
+import math
+
+one_stroke = [(1,random.random()) for i in range(200)]
+one_fan_fn = lambda x: (0.6*x + 0.4, 0.3*x + 0.7)
+one_fan = [one_fan_fn(random.random()) for i in range(100)]
+one = np.array(one_fan + one_stroke)
+
+def add_noice(coords,b):
+    noice = lambda : random.random()*b-b/2
+    return [(x+noice(),y+noice(),z+noice()) for x,y,z in coords]
+
+def zero_projection(x,y,w=0.5):
+    sign = -1 if random.randint(0,1)==0 else 1
+    z = 0
+    if y <= w/2:
+        # lower circle
+        z = math.sqrt((w/2)**2 - (w/2-y)**2) * sign
+    elif w/2 < y and y <= 1-w/2:
+        # sides
+        z = sign * w/2
+    elif 1-w/2 < y and y <=1:
+        # upper circle
+        z = math.sqrt((w/2)**2 - (w/2 - (1-y))**2) * sign
+    return (x,z+w,y)
+
+def add_zero_coord(coords):
+    width=0.75 # width of the zero
+    # upper circle y within [0.75,1] and lower circle within [0,0.25]
+    # for the sides the z coord is either 0.5 or 0
+    return [zero_projection(x,y,width) for x,y in coords]
+
+one_zero = add_zero_coord(one)
+one_zero = add_noice(one_zero,0.08)
+one_zero = np.array(one_zero)
+
+fig = px.scatter_3d(x=one_zero[:,0], y=one_zero[:,1], z=one_zero[:,2],
+                    range_x=(0,1.25), range_y=(0,1.25), range_z=(0,1.25),                      template="plotly_dark")
+
+fig.update_layout(
+    scene = dict(
+        xaxis = dict(backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6),
+        yaxis = dict(backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6,),
+        zaxis = dict(backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6),
+),
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(200,200,255,0.2)')
+fig.write_html("plotly/one_zero.html")
+#+END_SRC

@@ -1,0 +1,61 @@
+@import "compass/css3";
+
+.block-title {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+    margin-bottom: 0px !important;
+} 
+
+.DEFINITION {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}                              
+
+.DEFINITION :first-child {
+    margin-top: 0px !important;
+}
+
+.PROPOSITION {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}
+.THEOREM {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}
+.PROOF {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}
+.LEMMA {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}
+.COROLLARY {
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.10), 0px 10px 20px rgba(0,0,0,0.05), 0px 20px 20px rgba(0,0,0,0.05), 0px 30px 20px rgba(0,0,0,0.05) !important;
+    text-align: left;
+}
+.CODE{
+    /* todo copy regular code style */
+}
+
+.pseudo-code-comment{
+    opacity: 0.4;
+}
+
+.hljs{
+    display: block;
+}
+.hljs-in {
+    display: block;
+}
+.hljs-tbody{
+    display: block;
+}
+.hljs-ln-header{
+    border-bottom: 0px !important;
+}
+.hljs-header-sep{
+    border-bottom: 2px solid !important;
+    display: block;
+}

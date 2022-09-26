@@ -1,0 +1,59 @@
+#+BEGIN_SRC python :exports results :results none
+import pickle
+with open("contexts/factors.map","rb") as file:
+    factors = pickle.load(file)
+with open("contexts/bj_ord_factors.ctx","rb") as file:
+    bj_ord_factors = pickle.load(file)
+    bj_ord_factors["name"] =  bj_ord_factors.index
+with open("contexts/bj_incidences.adj","rb") as file:
+    bj_incidence = pickle.load(file)
+    bj_incidence = [", ".join(bj_incidence[g]) for g in  bj_ord_factors.index]
+    bj_ord_factors["I"] = bj_incidence
+
+import plotly.express as px
+fig =px.scatter_3d(bj_ord_factors,x="F1",y="F2",z="F3", template="plotly_dark",
+                   hover_name="name",
+                    hover_data={"F1": False,"F2": False,"F3" :False,"I":True
+                               # "Faktor1": [", ".join(factors["F1"][:i]) for i in bj_ord_factors["F1"]],
+                               # "Faktor2": [", ".join(factors["F2"][:i]) for i in bj_ord_factors["F2"]],
+                               # "Faktor3": [", ".join(factors["F3"][:i]) for i in bj_ord_factors["F3"]]
+                                }
+)
+# https://plotly.com/javascript/reference/#
+
+fig.update_layout(
+    scene = dict(
+        xaxis = dict(tickangle=45,
+                     tickfont=dict(size=14),
+                     titlefont=dict(size=16),
+                     ticktext=[""] + factors["F1"],
+                     backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6,
+                     tickvals=list(range(1+len(factors["F1"])))),
+        yaxis = dict(tickangle=45,
+                     backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6,
+                     tickfont=dict(size=14),
+                     titlefont=dict(size=16),
+                     ticktext=[""] + factors["F2"],
+                     tickvals=list(range(1+len(factors["F2"])))),
+        zaxis = dict(tickangle=45,
+                     backgroundcolor='rgba(20,20,20,0.2)',
+                     spikecolor='#3874dd',
+                     spikesides=False,
+                     spikethickness=6,
+                     tickfont=dict(size=14),
+                     titlefont=dict(size=16),
+                     ticktext=[""] + factors["F3"],
+                     tickvals=list(range(1+len(factors["F3"])))),
+),
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(200,200,255,0.2)',
+    hoverlabel=dict(font=dict(size=16)))
+
+fig.write_html("plotly/factor_3d.html")
+#+END_SRC

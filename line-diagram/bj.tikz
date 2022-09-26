@@ -1,0 +1,104 @@
+\colorlet{mivertexcolor}{blue}
+\colorlet{jivertexcolor}{red}
+\colorlet{vertexcolor}{mivertexcolor!50}
+\colorlet{bordercolor}{black!80}
+\colorlet{linecolor}{gray}
+% parameter corresponds to the used valuation function and can be addressed by #1
+\tikzset{vertexbase/.style 2 args={semithick, shape=circle, inner sep=2pt, outer sep=0pt, draw=bordercolor},%
+  vertex/.style 2 args={vertexbase={#1}{}, fill=vertexcolor!45},%
+  mivertex/.style 2 args={vertexbase={#1}{}, fill=mivertexcolor!45},%
+  jivertex/.style 2 args={vertexbase={#1}{}, fill=jivertexcolor!45},%
+  divertex/.style 2 args={vertexbase={#1}{}, top color=mivertexcolor!45, bottom color=jivertexcolor!45},%
+  conn/.style={-, thick, color=linecolor}%
+}
+\tikzstyle{s} = [text width=3cm,align=center,label distance=1mm]
+\tikzstyle{l} = [text width=3cm,align=left,label distance=1mm]
+\tikzstyle{r} = [text width=3cm,align=right,label distance=1mm]
+\begin{tikzpicture}[scale=0.5,text=white]
+  \begin{scope} %for scaling and the like
+    \begin{scope} %draw vertices
+      \foreach \nodename/\nodetype/\param/\xpos/\ypos in {%
+        0/vertex/0/1.8257940327237883/9.807025986525538,
+        1/jivertex/1/-1.9855630413859338/13.808950914340748,
+        2/jivertex/1/1.76227141482196/13.904234841193489,
+        3/jivertex/1/5.954764196342651/14.094802694898977,
+        4/divertex/1/11.13185755534169/15.968719923002922,
+        5/divertex/2/6.018745350947327/16.290329924105244,
+        6/vertex/2/-1.1467924199714332/16.93174634861203,
+        7/divertex/2/-3.0336862367661084/17.048604427334013,
+        8/vertex/2/2.143407122232933/17.93792107795961,
+        9/jivertex/2/-6.241578440808457/18.033205004812356,
+        10/mivertex/3/6.081809432146308/18.827237728585214,
+        11/mivertex/3/-2.11260827718959/19.938883541867217,
+        12/mivertex/3/-2.080846968238678/21.939846005774818,
+        13/mivertex/6/2.048123195380189/22.956207892204077,
+        14/mivertex/3/-6.082771896053885/23.115014436958653,
+        15/vertex/7/-2.0490856592877726/27.11693936477383,
+      } \node[\nodetype={\param}{}] (\nodename) at (\xpos, \ypos) {};
+    \end{scope}
+    \begin{scope} %draw connections
+      \path (11) edge[conn] (13);
+      \path (10) edge[conn] (13);
+      \path (12) edge[conn] (15);
+      \path (14) edge[conn] (15);
+      \path (9) edge[conn] (12);
+      \path (9) edge[conn] (14);
+      \path (13) edge[conn] (15);
+      \path (3) edge[conn] (8);
+      \path (3) edge[conn] (5);
+      \path (2) edge[conn] (10);
+      \path (2) edge[conn] (6);
+      \path (0) edge[conn] (3);
+      \path (0) edge[conn] (2);
+      \path (0) edge[conn] (1);
+      \path (0) edge[conn] (4);
+      \path (6) edge[conn] (11);
+      \path (6) edge[conn] (14);
+      \path (1) edge[conn] (9);
+      \path (1) edge[conn] (6);
+      \path (1) edge[conn] (8);
+      \path (1) edge[conn] (7);
+      \path (8) edge[conn] (12);
+      \path (8) edge[conn] (13);
+      \path (5) edge[conn] (10);
+      \path (7) edge[conn] (11);
+      \path (4) edge[conn] (13);
+    \end{scope}
+    \begin{scope} %add labels
+      \foreach \nodename/\labelpos/\labelopts/\labelcontent in {%
+        4/above/s/{Erdnussbutter, Erdnussbuttereis},
+        5/above/s/{Karamelleis},
+        7/above/s/{Teig},
+        10/above/s/{Karamell},
+        11/above/s/{Vanilleeis},
+        12/above/s/{Schokoeis},
+        13/above/s/{Schokostueckchen},
+        14/above/s/{Brownie},
+        1/below/l/{Half Baked},
+        2/below/s/{Salted Caramel Brownie},
+        3/below/r/{Karamel Sutra},
+        4/below/s/{Peanut Butter Cup},
+        5/below/s/{Caramel Chew Chew},
+        7/below/s/{Cookie Dough},
+        9/below/l/{Chocolate Fudge Brownie},
+        0/right//{0},
+        1/right//{1},
+        2/right//{1},
+        3/right//{1},
+        4/right//{1},
+        5/right//{2},
+        6/right//{2},
+        7/right//{2},
+        8/right//{2},
+        9/right//{2},
+        10/right//{3},
+        11/right//{3},
+        12/right//{3},
+        13/right//{6},
+        14/right//{3},
+        15/right//{7}
+      } \coordinate[label={[\labelopts]\labelpos:{\labelcontent}}](c) at (\nodename);
+    \end{scope}
+  \end{scope}
+\end{tikzpicture}
+
